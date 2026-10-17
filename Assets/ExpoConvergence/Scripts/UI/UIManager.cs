@@ -155,27 +155,28 @@ namespace ExpoConvergence
             lockdownFill.type = Image.Type.Filled;
             lockdownFill.fillMethod = Image.FillMethod.Horizontal;
 
-            // Sector & objective, top left.
+            // Sector & objective, top left. Anchored() pivots at the anchor, so positions are top-left corners;
+            // the objective wraps inside 600 px so it never reaches the timer, even on narrower screens.
             var obj = UIKit.Anchored(t, "Objective", new Vector2(0f, 1f), new Vector2(40f, -36f), new Vector2(640, 100));
-            UIKit.Image(obj, "Accent", UISprites.White, ExpoPalette.Gold, new Vector2(0f, 1f), new Vector2(2f, -36f), new Vector2(4, 64));
-            sectorText = UIKit.Text(obj, "Sector", "ARRIVAL CONCOURSE", 17f, ExpoPalette.Gold, new Vector2(0f, 1f), new Vector2(330f, -16f), new Vector2(640, 26), TextAlignmentOptions.Left, true, 7f);
-            objectiveText = UIKit.Text(obj, "Text", "", 23f, Color.white, new Vector2(0f, 1f), new Vector2(330f, -50f), new Vector2(640, 60), TextAlignmentOptions.TopLeft, false, 1f);
+            UIKit.Image(obj, "Accent", UISprites.White, ExpoPalette.Gold, new Vector2(0f, 1f), new Vector2(0f, -4f), new Vector2(4, 64));
+            sectorText = UIKit.Text(obj, "Sector", "ARRIVAL CONCOURSE", 17f, ExpoPalette.Gold, new Vector2(0f, 1f), new Vector2(18f, -2f), new Vector2(600, 26), TextAlignmentOptions.Left, true, 7f);
+            objectiveText = UIKit.Text(obj, "Text", "", 23f, Color.white, new Vector2(0f, 1f), new Vector2(18f, -32f), new Vector2(600, 62), TextAlignmentOptions.TopLeft, false, 1f);
 
-            // Keys status, top right.
+            // Keys status, top right, flush with the right margin.
             var keys = UIKit.Anchored(t, "Keys", new Vector2(1f, 1f), new Vector2(-40f, -36f), new Vector2(360, 80));
-            keysText = UIKit.Text(keys, "Label", "LANDMARKS RESTORED  0/3", 16f, ExpoPalette.TextDim, new Vector2(1f, 1f), new Vector2(-180f, -14f), new Vector2(360, 24), TextAlignmentOptions.Right, true, 6f);
+            keysText = UIKit.Text(keys, "Label", "LANDMARKS RESTORED  0/3", 16f, ExpoPalette.TextDim, new Vector2(1f, 1f), new Vector2(0f, -2f), new Vector2(360, 24), TextAlignmentOptions.Right, true, 6f);
             for (int i = 0; i < 3; i++)
-                keyDiamonds[i] = UIKit.Image(keys, "Key" + i, UISprites.Diamond, ExpoPalette.ForPassport((PassportType)i).WithAlpha(0.25f), new Vector2(1f, 1f), new Vector2(-106f + i * 34f, -52f), new Vector2(26, 26));
-            fpsText = UIKit.Text(keys, "Fps", "", 13f, ExpoPalette.TextDim, new Vector2(1f, 1f), new Vector2(-180f, -82f), new Vector2(360, 20), TextAlignmentOptions.Right, false, 3f);
+                keyDiamonds[i] = UIKit.Image(keys, "Key" + i, UISprites.Diamond, ExpoPalette.ForPassport((PassportType)i).WithAlpha(0.25f), new Vector2(1f, 1f), new Vector2(-(2 - i) * 34f, -32f), new Vector2(26, 26));
+            fpsText = UIKit.Text(keys, "Fps", "", 13f, ExpoPalette.TextDim, new Vector2(1f, 1f), new Vector2(0f, -64f), new Vector2(360, 20), TextAlignmentOptions.Right, false, 3f);
 
             // Passport cards, bottom centre.
             for (int i = 0; i < 3; i++) cards[i] = BuildCard(t, i);
 
-            // Stamina, bottom left.
+            // Stamina, bottom left, on the same 40 px margin as the objective (positions are bottom-left corners).
             var stam = UIKit.Anchored(t, "Stamina", new Vector2(0f, 0f), new Vector2(40f, 46f), new Vector2(300, 40));
-            UIKit.Text(stam, "Label", "STAMINA", 14f, ExpoPalette.TextDim, new Vector2(0f, 0f), new Vector2(150f, 30f), new Vector2(300, 20), TextAlignmentOptions.Left, true, 8f);
-            UIKit.Image(stam, "Back", UISprites.Rounded, new Color(1, 1, 1, 0.08f), new Vector2(0f, 0f), new Vector2(140f, 10f), new Vector2(280, 9), true);
-            staminaFill = UIKit.Image(stam, "Fill", UISprites.White, new Color(0.75f, 0.92f, 1f), new Vector2(0f, 0f), new Vector2(140f, 10f), new Vector2(276, 5));
+            UIKit.Text(stam, "Label", "STAMINA", 14f, ExpoPalette.TextDim, new Vector2(0f, 0f), new Vector2(0f, 18f), new Vector2(300, 20), TextAlignmentOptions.Left, true, 8f);
+            UIKit.Image(stam, "Back", UISprites.Rounded, new Color(1, 1, 1, 0.08f), new Vector2(0f, 0f), new Vector2(0f, 4f), new Vector2(280, 9), true);
+            staminaFill = UIKit.Image(stam, "Fill", UISprites.White, new Color(0.75f, 0.92f, 1f), new Vector2(0f, 0f), new Vector2(2f, 6f), new Vector2(276, 5));
             staminaFill.type = Image.Type.Filled;
             staminaFill.fillMethod = Image.FillMethod.Horizontal;
 
