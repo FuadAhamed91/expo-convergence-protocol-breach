@@ -66,6 +66,8 @@ namespace ExpoConvergence
             camData.renderPostProcessing = true;
             camData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
             camData.antialiasingQuality = AntialiasingQuality.Medium;
+            // Dithering hides 8-bit banding in the dark sky gradients and the moon halo.
+            camData.dithering = true;
             camData.renderShadows = true;
             var rig = cam.GetComponent<ThirdPersonCameraController>();
             if (rig == null) rig = cam.gameObject.AddComponent<ThirdPersonCameraController>();

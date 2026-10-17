@@ -26,6 +26,12 @@ namespace ExpoConvergence
         CanvasGroup toastGroup, hintGroup, interactGroup;
         float toastTimer, hintTimer, letterbox, letterboxTarget;
 
+        // Objective waypoint.
+        RectTransform waypoint;
+        CanvasGroup waypointGroup;
+        Image waypointIcon, waypointArrow;
+        TextMeshProUGUI waypointDistance, waypointLabel;
+
         class Card
         {
             public RectTransform rt;
@@ -122,6 +128,8 @@ namespace ExpoConvergence
             ((RectTransform)alertVignette.transform).anchorMin = Vector2.zero;
             ((RectTransform)alertVignette.transform).anchorMax = Vector2.one;
             ((RectTransform)alertVignette.transform).sizeDelta = Vector2.zero;
+            // Soft shade along the top edge so the objective and counters read over bright signage.
+            UIKit.Image(t, "TopShade", UISprites.VerticalGradient, new Color(0f, 0.005f, 0.02f, 0.5f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(4000, 230));
 
             // Countdown, top centre.
             var timer = UIKit.Anchored(t, "Timer", new Vector2(0.5f, 1f), new Vector2(0, -24f), new Vector2(420, 120));
@@ -178,6 +186,16 @@ namespace ExpoConvergence
             for (int i = 0; i < arrows.Length; i++)
                 arrows[i] = UIKit.Image(t, "Threat" + i, UISprites.Arrow, ExpoPalette.Suspicious.WithAlpha(0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(34, 34));
 
+            // Objective waypoint (diamond + distance, clamped to the screen edge when off-screen).
+            waypoint = UIKit.Anchored(t, "Waypoint", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(60, 60));
+            waypointGroup = waypoint.gameObject.AddComponent<CanvasGroup>();
+            waypointIcon = UIKit.Image(waypoint, "Icon", UISprites.Diamond, Color.white, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(30, 30));
+            UIKit.Image(waypoint, "Glow", UISprites.Glow, new Color(1, 1, 1, 0.25f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(70, 70)).transform.SetAsFirstSibling();
+            waypointArrow = UIKit.Image(waypoint, "Arrow", UISprites.Arrow, Color.white, new Vector2(0.5f, 0.5f), new Vector2(0, 30f), new Vector2(22, 22));
+            waypointDistance = UIKit.Text(waypoint, "Distance", "", 15f, Color.white, new Vector2(0.5f, 0.5f), new Vector2(0, -28f), new Vector2(160, 20), TextAlignmentOptions.Center, true, 3f);
+            waypointLabel = UIKit.Text(waypoint, "Label", "", 12f, ExpoPalette.TextDim, new Vector2(0.5f, 0.5f), new Vector2(0, -46f), new Vector2(320, 18), TextAlignmentOptions.Center, true, 4f);
+            waypointGroup.alpha = 0f;
+
             // Interaction prompt.
             interactPanel = UIKit.Anchored(t, "Interact", new Vector2(0.5f, 0.5f), new Vector2(0, -150f), new Vector2(620, 64));
             interactGroup = interactPanel.gameObject.AddComponent<CanvasGroup>();
@@ -208,9 +226,10 @@ namespace ExpoConvergence
             card.glow = UIKit.Image(card.rt, "Glow", UISprites.Glow, c.WithAlpha(0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(300, 190));
             card.bg = UIKit.Image(card.rt, "Back", UISprites.Rounded, new Color(0.03f, 0.05f, 0.09f, 0.82f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(220, 112), true);
             card.bar = UIKit.Image(card.rt, "Bar", UISprites.White, c, new Vector2(0.5f, 1f), new Vector2(0, -3f), new Vector2(200, 4));
-            card.key = UIKit.Text(card.rt, "Key", (i + 1).ToString(), 30f, c, new Vector2(0f, 1f), new Vector2(26f, -36f), new Vector2(40, 40), TextAlignmentOptions.Center, true, 0f);
-            card.country = UIKit.Text(card.rt, "Country", ExpoPalette.CountryName(p), 15f, Color.white, new Vector2(0f, 1f), new Vector2(124f, -26f), new Vector2(160, 22), TextAlignmentOptions.Left, true, 5f);
-            card.ability = UIKit.Text(card.rt, "Ability", ExpoPalette.AbilityName(p), 17f, c, new Vector2(0f, 1f), new Vector2(122f, -50f), new Vector2(150, 26), TextAlignmentOptions.Left, true, 2f);
+            // Anchored() pivots at the anchor, so these positions are each label's top-left corner.
+            card.key = UIKit.Text(card.rt, "Key", (i + 1).ToString(), 30f, c, new Vector2(0f, 1f), new Vector2(12f, -30f), new Vector2(40, 48), TextAlignmentOptions.Center, true, 0f);
+            card.country = UIKit.Text(card.rt, "Country", ExpoPalette.CountryName(p), 15f, Color.white, new Vector2(0f, 1f), new Vector2(58f, -26f), new Vector2(150, 22), TextAlignmentOptions.Left, true, 5f);
+            card.ability = UIKit.Text(card.rt, "Ability", ExpoPalette.AbilityName(p), 17f, c, new Vector2(0f, 1f), new Vector2(58f, -50f), new Vector2(150, 26), TextAlignmentOptions.Left, true, 2f);
             card.status = UIKit.Text(card.rt, "Status", "READY", 13f, ExpoPalette.TextDim, new Vector2(0.5f, 0f), new Vector2(0, 18f), new Vector2(200, 20), TextAlignmentOptions.Center, true, 8f);
             foreach (var label in new[] { card.country, card.ability, card.status })
             {
@@ -234,25 +253,32 @@ namespace ExpoConvergence
         {
             title = Group(root, "Title");
             var t = title.transform;
-            // The gradient sprite is opaque at the top; flip it for the bottom shade.
-            UIKit.Image(t, "TopShade", UISprites.VerticalGradient, new Color(0, 0, 0, 0.75f), new Vector2(0.5f, 1f), new Vector2(0, -170f), new Vector2(1920, 340));
-            UIKit.Image(t, "BottomShade", UISprites.VerticalGradient, new Color(0, 0, 0, 0.85f), new Vector2(0.5f, 0f), new Vector2(0, 210f), new Vector2(1920, 420)).transform.localScale = new Vector3(1, -1, 1);
-            // Soft dark band behind the title block so it reads over the bright dome.
-            UIKit.Image(t, "TitleBand", UISprites.Glow, new Color(0f, 0.01f, 0.03f, 0.82f), new Vector2(0.5f, 0.5f), new Vector2(0, 60f), new Vector2(2100, 620));
+            // The title block lives in the night sky above the dome; the prompt sits low, clear of the lattice.
+            // The gradient sprite is opaque at the top; the bottom shade is flipped about its centre.
+            UIKit.Image(t, "TopShade", UISprites.VerticalGradient, new Color(0f, 0.005f, 0.02f, 0.86f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(4000, 640));
+            var bottomShade = UIKit.Image(t, "BottomShade", UISprites.VerticalGradient, new Color(0, 0, 0, 0.9f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(4000, 400));
+            bottomShade.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            bottomShade.rectTransform.anchoredPosition = new Vector2(0, 200f);
+            bottomShade.rectTransform.localScale = new Vector3(1, -1, 1);
+            // Soft dark glow behind the title so passing landmark beams never wash it out.
+            UIKit.Image(t, "TitleBand", UISprites.Glow, new Color(0f, 0.01f, 0.03f, 0.6f), new Vector2(0.5f, 1f), new Vector2(0, -60f), new Vector2(1900, 480));
 
             var main = UIKit.Text(t, "Title", UIKit.Gradient("EXPO CONVERGENCE", ExpoPalette.Gold, Color.white, ExpoPalette.Blue, Color.white, ExpoPalette.Emerald), 104f, Color.white,
-                new Vector2(0.5f, 0.5f), new Vector2(0, 170f), new Vector2(1800, 130), TextAlignmentOptions.Center, true, 14f);
+                new Vector2(0.5f, 1f), new Vector2(0, -150f), new Vector2(1800, 130), TextAlignmentOptions.Center, true, 14f);
             main.richText = true;
-            UIKit.Text(t, "Subtitle", "PROTOCOL  BREACH", 40f, new Color(0.8f, 0.93f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0, 84f), new Vector2(1200, 56), TextAlignmentOptions.Center, false, 44f);
+            UIKit.Text(t, "Subtitle", "PROTOCOL  BREACH", 40f, new Color(0.8f, 0.93f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -282f), new Vector2(1200, 56), TextAlignmentOptions.Center, false, 44f);
             for (int i = 0; i < 3; i++)
             {
                 var c = ExpoPalette.ForPassport((PassportType)i);
-                UIKit.Image(t, "Chip" + i, UISprites.Rounded, c.WithAlpha(0.9f), new Vector2(0.5f, 0.5f), new Vector2((i - 1) * 190f, 26f), new Vector2(170, 6), true);
-                UIKit.Text(t, "ChipLabel" + i, $"{ExpoPalette.CountryName((PassportType)i)}  ·  {ExpoPalette.AbilityName((PassportType)i)}", 13f, c, new Vector2(0.5f, 0.5f), new Vector2((i - 1) * 190f, 6f), new Vector2(190, 20), TextAlignmentOptions.Center, true, 3f);
+                UIKit.Image(t, "Chip" + i, UISprites.Rounded, c.WithAlpha(0.9f), new Vector2(0.5f, 1f), new Vector2((i - 1) * 190f, -356f), new Vector2(170, 6), true);
+                UIKit.Text(t, "ChipLabel" + i, $"{ExpoPalette.CountryName((PassportType)i)}\n<size=11><alpha=#B0>{ExpoPalette.AbilityName((PassportType)i)}</size>", 13f, c, new Vector2(0.5f, 1f), new Vector2((i - 1) * 190f, -368f), new Vector2(190, 40), TextAlignmentOptions.Center, true, 3f);
             }
             UIKit.Text(t, "Tagline", "Opening night at Expo City Dubai. A rogue security grid has locked down the districts.\nCarry three diplomatic keys through the dark and bring the Festival of Passports back to light.",
-                21f, ExpoPalette.TextDim, new Vector2(0.5f, 0.5f), new Vector2(0, -62f), new Vector2(1200, 70), TextAlignmentOptions.Center, false, 1f);
-            titlePrompt = UIKit.Text(t, "Prompt", "PRESS  ENTER  OR  CLICK  TO  BEGIN", 24f, Color.white, new Vector2(0.5f, 0.5f), new Vector2(0, -160f), new Vector2(1200, 40), TextAlignmentOptions.Center, true, 10f);
+                21f, new Color(0.78f, 0.84f, 0.92f), new Vector2(0.5f, 1f), new Vector2(0, -420f), new Vector2(1200, 70), TextAlignmentOptions.Center, false, 1f);
+            // A dark pill keeps the prompt readable over the dome's bright base rings.
+            var pill = UIKit.Image(t, "PromptPill", UISprites.Rounded, new Color(0.01f, 0.02f, 0.05f, 0.78f), new Vector2(0.5f, 0f), new Vector2(0, 110f), new Vector2(620, 52), true);
+            UIKit.Image(pill.transform, "PromptEdge", UISprites.Rounded, ExpoPalette.Cyan.WithAlpha(0.35f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(620, 2), true);
+            titlePrompt = UIKit.Text(t, "Prompt", "PRESS  ENTER  OR  CLICK  TO  BEGIN", 24f, Color.white, new Vector2(0.5f, 0f), new Vector2(0, 116f), new Vector2(1200, 40), TextAlignmentOptions.Center, true, 10f);
             UIKit.Text(t, "Controls", "WASD MOVE   ·   MOUSE LOOK   ·   SHIFT SPRINT   ·   SPACE SLIDE   ·   1 / 2 / 3 PASSPORTS   ·   RIGHT-CLICK ABILITY   ·   E INTERACT   ·   ESC PAUSE",
                 15f, ExpoPalette.TextDim, new Vector2(0.5f, 0f), new Vector2(0, 70f), new Vector2(1800, 24), TextAlignmentOptions.Center, false, 3f);
             UIKit.Text(t, "Credit", "FESTIVAL OF PASSPORTS  ·  STUDENT GAME COMPETITION  ·  BUILT IN UNITY 6 WITH BLENDER", 13f, new Color(0.5f, 0.58f, 0.7f), new Vector2(0.5f, 0f), new Vector2(0, 34f), new Vector2(1400, 22), TextAlignmentOptions.Center, false, 6f);
@@ -506,7 +532,7 @@ namespace ExpoConvergence
 
             if (state == GameState.Title)
             {
-                if (titlePrompt != null) titlePrompt.alpha = 0.55f + 0.45f * Mathf.Sin(Time.unscaledTime * 3f);
+                if (titlePrompt != null) titlePrompt.alpha = 0.72f + 0.28f * Mathf.Sin(Time.unscaledTime * 3f);
                 if (PlayerInput.AnyConfirmPressed) Game.State.BeginBriefing();
             }
             if (state == GameState.Cinematic && hud != null) hud.alpha = Mathf.MoveTowards(hud.alpha, 0f, dt * 4f);
@@ -531,6 +557,7 @@ namespace ExpoConvergence
             UpdateInteraction(dt);
             UpdateReticle();
             UpdateThreatArrows();
+            UpdateWaypoint(dt);
 
             if (Game.Player != null && staminaFill != null)
             {
@@ -654,6 +681,48 @@ namespace ExpoConvergence
                 lockText.text = france ? "AIM AT A CAMERA OR SCANNER" : "";
             }
             lockText.color = target != null ? ExpoPalette.Blue : ExpoPalette.TextDim;
+        }
+
+        void UpdateWaypoint(float dt)
+        {
+            var target = Game.World != null ? Game.World.CurrentObjective : null;
+            var rig = Game.CameraRig;
+            bool show = target != null && rig != null && Game.Player != null && Game.State != null && Game.State.Current == GameState.Playing;
+            float dist = show ? Vector3.Distance(Game.Player.transform.position, target.transform.position) : 0f;
+            if (show && dist < 3.5f) show = false;   // the interaction prompt takes over up close
+            waypointGroup.alpha = Mathf.MoveTowards(waypointGroup.alpha, show ? 1f : 0f, dt * 4f);
+            if (!show) return;
+
+            Color c = target.AccentColor;
+            waypointIcon.color = c;
+            waypointArrow.color = c;
+            waypointDistance.text = $"{dist:0} m";
+            waypointLabel.text = target.title;
+
+            Vector3 world = target.transform.position + Vector3.up * 2.8f;
+            Vector3 sp = rig.Cam.WorldToScreenPoint(world);
+            bool behind = sp.z < 0f;
+            Vector2 center = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+            Vector2 offset = ((Vector2)sp - center) / Mathf.Max(0.0001f, root.localScale.x);
+            if (behind) offset = -offset;
+            Vector2 limit = root.rect.size * 0.5f - new Vector2(80f, 90f);
+            bool clamped = behind || Mathf.Abs(offset.x) > limit.x || Mathf.Abs(offset.y) > limit.y;
+            if (clamped)
+            {
+                if (offset.sqrMagnitude < 1f) offset = Vector2.down;
+                float scale = Mathf.Min(limit.x / Mathf.Max(0.001f, Mathf.Abs(offset.x)), limit.y / Mathf.Max(0.001f, Mathf.Abs(offset.y)));
+                offset *= scale;
+            }
+            waypoint.anchoredPosition = Vector2.Lerp(waypoint.anchoredPosition, offset, 1f - Mathf.Exp(-14f * dt));
+            // Near an on-screen objective its own holo title is readable, so the label bows out.
+            waypointLabel.alpha = clamped ? 1f : Mathf.Clamp01((dist - 12f) / 8f);
+            waypointArrow.enabled = clamped;
+            if (clamped)
+            {
+                float ang = Mathf.Atan2(offset.x, offset.y) * Mathf.Rad2Deg;
+                waypointArrow.rectTransform.localRotation = Quaternion.Euler(0, 0, -ang);
+                waypointArrow.rectTransform.anchoredPosition = offset.normalized * 30f;
+            }
         }
 
         void UpdateThreatArrows()

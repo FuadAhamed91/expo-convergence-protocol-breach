@@ -89,7 +89,7 @@ namespace ExpoConvergence
                 {
                     fireworks++;
                     Vector3 p = transform.position + new Vector3(UnityEngine.Random.Range(-18f, 18f), height * UnityEngine.Random.Range(0.55f, 0.95f), UnityEngine.Random.Range(-18f, 18f));
-                    VfxFactory.Firework(p, fireworks % 2 == 0 ? c : Color.Lerp(c, Color.white, 0.6f));
+                    VfxFactory.Firework(p, fireworks % 2 == 0 ? c : Color.Lerp(c, Color.white, 0.6f), Mathf.Clamp(height / 45f, 1.4f, 2.6f));
                     Game.Audio?.PlaySfxAt("firework", p, 0.7f);
                 }
                 yield return null;

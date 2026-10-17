@@ -65,7 +65,8 @@ namespace ExpoConvergence
                 var next = (PassportType)(index + 1);
                 Game.Passports?.Unlock(next);
                 GameEvents.RaiseToast($"{ExpoPalette.CountryName(next)} KEY DECRYPTED  ·  {ExpoPalette.AbilityName(next)} ONLINE", ExpoPalette.ForPassport(next), 4.5f);
-                GameEvents.RaiseHint($"Press {index + 2} to select the {ExpoPalette.CountryName(next)} passport  ·  RIGHT-CLICK for {ExpoPalette.AbilityName(next)}", 8f);
+                // Unlock() equips the new passport straight away, so the hint confirms rather than instructs.
+                GameEvents.RaiseHint($"{ExpoPalette.CountryName(next)} passport equipped  ·  RIGHT-CLICK for {ExpoPalette.AbilityName(next)}  ·  switch anytime with 1 / 2 / 3", 8f);
                 SetObjective(index == 0 ? "Head east through the arcade into the France district" : "Head south into the United Kingdom district");
             }
             else

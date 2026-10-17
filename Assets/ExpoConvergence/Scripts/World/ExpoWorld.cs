@@ -26,6 +26,19 @@ namespace ExpoConvergence
         SciFiDoor doorUAE, doorFrance, doorUK, doorWalk;
         AlWaslDome dome;
         readonly List<Renderer> waterOrbs = new List<Renderer>();
+        readonly SortedList<int, ConsularGateTerminal> objectiveChain = new SortedList<int, ConsularGateTerminal>();
+
+        /// <summary>The next terminal the courier should reach (drives the HUD waypoint).</summary>
+        public ConsularGateTerminal CurrentObjective
+        {
+            get
+            {
+                foreach (var kv in objectiveChain) if (kv.Value != null && !kv.Value.Done) return kv.Value;
+                return null;
+            }
+        }
+
+        void RegisterObjective(int order, ConsularGateTerminal t) => objectiveChain[order] = t;
         Material waterMat;
 
         // Shared materials

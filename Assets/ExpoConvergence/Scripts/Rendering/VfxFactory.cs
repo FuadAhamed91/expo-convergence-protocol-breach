@@ -64,15 +64,16 @@ namespace ExpoConvergence
         }
 
         /// <summary>A coloured fireworks shell: a bright core flash plus trailing stars falling under gravity.</summary>
-        public static void Firework(Vector3 pos, Color color)
+        /// <summary>A trailing starburst; <paramref name="scale"/> grows it for shells seen from far away (landmark tops).</summary>
+        public static void Firework(Vector3 pos, Color color, float scale = 1f)
         {
-            var ps = MakeSystem("Firework", pos, color, 2.2f, 11f, 0.28f, 140);
+            var ps = MakeSystem("Firework", pos, color, 2.2f, 11f * scale, 0.28f * scale, 140);
             var main = ps.main;
             main.gravityModifier = 0.45f;
             var limit = ps.limitVelocityOverLifetime;
             limit.enabled = true;
             limit.dampen = 0.08f;
-            limit.limit = 3f;
+            limit.limit = 3f * scale;
             var trails = ps.trails;
             trails.enabled = true;
             trails.lifetime = 0.25f;

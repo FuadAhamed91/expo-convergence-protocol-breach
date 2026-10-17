@@ -1,5 +1,5 @@
 // Midnight-navy skybox: vertical gradient, warm city glow on the horizon, twinkling stars,
-// faint aurora-like bands and a soft moon.
+// a faint Milky Way lane and a soft moon.
 Shader "Expo/NightSky"
 {
     Properties
@@ -72,16 +72,21 @@ Shader "Expo/NightSky"
                 // Warm light pollution from the city sitting on the horizon.
                 sky += _GlowColor.rgb * exp(-abs(h) * _GlowHeight);
 
-                // Slow, faint bands high in the sky.
-                float band = sin(d.x * 3.1 + d.z * 1.7 + _Time.y * 0.02) * sin(d.z * 2.3 - d.x * 0.7);
-                sky += _BandColor.rgb * smoothstep(0.55, 1.0, band) * smoothstep(0.15, 0.6, h);
+                // A faint Milky Way: a clumpy great-circle lane with a darker dust rift down its middle.
+                float3 laneN = normalize(float3(0.42, 0.3, 0.86));
+                float g = dot(d, laneN);
+                float lane = exp(-g * g * 22.0);
+                float clump = 0.55 + 0.45 * sin(d.x * 7.0 + d.y * 3.0 + 1.3) * sin(d.z * 9.0 - d.y * 5.0 + 0.7);
+                float grain = 0.8 + 0.2 * sin(d.x * 61.0 + d.y * 23.0) * sin(d.z * 57.0 - d.y * 31.0);
+                float rift = 1.0 - 0.55 * exp(-g * g * 260.0);
+                sky += _BandColor.rgb * 0.55 * lane * clump * grain * rift * smoothstep(0.08, 0.45, h);
 
-                // Stars: one candidate per cell on a fine 3D grid, hidden near the horizon haze.
+                // Stars: one candidate per cell on a fine 3D grid, denser along the lane, hidden near the horizon haze.
                 float3 p = d * 260.0;
                 float3 cell = floor(p);
                 float r = Hash13(cell);
                 float3 f = frac(p) - 0.5;
-                float star = step(_StarDensity, r) * smoothstep(0.28, 0.0, length(f));
+                float star = step(_StarDensity - lane * 0.006, r) * smoothstep(0.28, 0.0, length(f));
                 float twinkle = 0.6 + 0.4 * sin(_Time.y * (1.5 + r * 4.0) + r * 60.0);
                 sky += star * twinkle * _StarBrightness * smoothstep(0.05, 0.35, h);
 
@@ -92,7 +97,10 @@ Shader "Expo/NightSky"
                 float halo = pow(saturate(m), 2400.0) * 0.4 + pow(saturate(m), 160.0) * 0.06;
                 sky += _MoonColor.rgb * (disc + halo);
 
-                return half4(sky, 1.0);
+                // Per-pixel dither of about one 8-bit step, so the dark gradients never posterize into contours.
+                sky += (Hash13(float3(input.positionCS.xy, 17.0)) - 0.5) * 0.0016;
+
+                return half4(max(sky, 0.0), 1.0);
             }
             ENDHLSL
         }

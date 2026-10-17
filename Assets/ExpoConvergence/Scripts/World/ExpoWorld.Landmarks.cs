@@ -12,34 +12,34 @@ namespace ExpoConvergence
         {
             // NW · Burj Display + France consular gate.
             Dais(new Vector3(-49f, 0, 49.5f), ExpoPalette.Gold);
-            Terminal(new Vector3(-49f, 0.3f, 50.2f), new Vector3(-49f, 0, 44f), PassportType.UAE, false, "BURJ DISPLAY", "RESTORE LANDMARK", 1.6f,
-                () => landmarks[0].Restore(new Vector3(-49f, 0, 49f), () => Game.Progress?.RestoreLandmark(0)));
-            Terminal(new Vector3(-43.2f, 0f, 54f), new Vector3(-49f, 0, 49f), PassportType.France, false, "FRANCE CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
+            RegisterObjective(1, Terminal(new Vector3(-49f, 0.3f, 50.2f), new Vector3(-49f, 0, 44f), PassportType.UAE, false, "BURJ DISPLAY", "RESTORE LANDMARK", 1.6f,
+                () => landmarks[0].Restore(new Vector3(-49f, 0, 49f), () => Game.Progress?.RestoreLandmark(0))));
+            RegisterObjective(2, Terminal(new Vector3(-43.2f, 0f, 54f), new Vector3(-49f, 0, 49f), PassportType.France, false, "FRANCE CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
             {
                 doorFrance.Open();
                 GameEvents.RaiseToast("FRANCE DISTRICT OPEN  ·  OPTICAL GRID ACTIVE", ExpoPalette.Blue, 3f);
                 Game.Progress?.SetObjective("Blind the optical grid and reach the Eiffel Display");
-            });
+            }));
             Planter(staticRoot, new Vector3(-55f, 0, 55f), new Vector3(2.6f, 1.2f, 2.6f), mSandDark, ExpoPalette.Gold, true);
             Planter(staticRoot, new Vector3(-55f, 0, 43f), new Vector3(2.6f, 1.2f, 2.6f), mSandDark, ExpoPalette.Gold, true);
 
             // NE · Eiffel Display + UK consular gate.
             Dais(new Vector3(49.5f, 0, 49f), ExpoPalette.Blue);
-            Terminal(new Vector3(50.2f, 0.3f, 49f), new Vector3(44f, 0, 49f), PassportType.France, false, "EIFFEL DISPLAY", "RESTORE LANDMARK", 1.6f,
-                () => landmarks[1].Restore(new Vector3(49f, 0, 49f), () => Game.Progress?.RestoreLandmark(1)));
-            Terminal(new Vector3(54f, 0f, 43.2f), new Vector3(49f, 0, 49f), PassportType.UK, false, "UK CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
+            RegisterObjective(4, Terminal(new Vector3(50.2f, 0.3f, 49f), new Vector3(44f, 0, 49f), PassportType.France, false, "EIFFEL DISPLAY", "RESTORE LANDMARK", 1.6f,
+                () => landmarks[1].Restore(new Vector3(49f, 0, 49f), () => Game.Progress?.RestoreLandmark(1))));
+            RegisterObjective(5, Terminal(new Vector3(54f, 0f, 43.2f), new Vector3(49f, 0, 49f), PassportType.UK, false, "UK CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
             {
                 doorUK.Open();
                 GameEvents.RaiseToast("UK DISTRICT OPEN  ·  LASER GRID ACTIVE", ExpoPalette.Emerald, 3f);
                 Game.Progress?.SetObjective("Bend time through the laser grid and reach the Big Ben Display");
-            });
+            }));
             Topiary(new Frame { s = staticRoot, d = dynamicRoot }, new Vector3(55f, 0, 55f));
             Topiary(new Frame { s = staticRoot, d = dynamicRoot }, new Vector3(43f, 0, 55f));
 
             // SE · Big Ben Display and the Poem Pavilion sculpture.
             Dais(new Vector3(49f, 0, -49.5f), ExpoPalette.Emerald);
-            Terminal(new Vector3(49f, 0.3f, -50.2f), new Vector3(49f, 0, -44f), PassportType.UK, false, "BIG BEN DISPLAY", "RESTORE LANDMARK", 1.6f,
-                () => landmarks[2].Restore(new Vector3(49f, 0, -49f), () => Game.Progress?.RestoreLandmark(2)));
+            RegisterObjective(6, Terminal(new Vector3(49f, 0.3f, -50.2f), new Vector3(49f, 0, -44f), PassportType.UK, false, "BIG BEN DISPLAY", "RESTORE LANDMARK", 1.6f,
+                () => landmarks[2].Restore(new Vector3(49f, 0, -49f), () => Game.Progress?.RestoreLandmark(2))));
             PoemPavilion(new Vector3(54.5f, 0, -54.5f));
 
             // SW · decorative.
@@ -152,8 +152,8 @@ namespace ExpoConvergence
             dome = domeGo.AddComponent<AlWaslDome>();
             dome.Bind(sectors, lattice, oculus, crown, domeLight);
 
-            var pedestal = Terminal(new Vector3(0, 0.3f, -0.4f), new Vector3(0, 0, -10f), PassportType.UAE, true, "AUTHENTICATION PEDESTAL", "INSERT TRI-DRIVE", 2f,
-                () => dome.BeginFinale(new Vector3(0, 0.3f, 0)));
+            RegisterObjective(7, Terminal(new Vector3(0, 0.3f, -0.4f), new Vector3(0, 0, -10f), PassportType.UAE, true, "AUTHENTICATION PEDESTAL", "INSERT TRI-DRIVE", 2f,
+                () => dome.BeginFinale(new Vector3(0, 0.3f, 0))));
 
             BuildSealGate();
         }
@@ -444,7 +444,8 @@ namespace ExpoConvergence
                     if (n.Contains("glow") || n.Contains("emiss") || n.Contains("accent"))
                     {
                         int band = Mathf.FloorToInt((r.bounds.min.y - lc.transform.position.y) / 8f);
-                        if (!bands.TryGetValue(band, out var m)) { m = Band(lc, band * 8f, n.Contains("beacon") ? 8f : 3.6f); bands[band] = m; }
+                        // Kept below the tonemapper's white point so each nation's colour survives.
+                        if (!bands.TryGetValue(band, out var m)) { m = Band(lc, band * 8f, n.Contains("beacon") ? 6f : 2.4f); bands[band] = m; }
                         mats[i] = m;
                     }
                     else mats[i] = body;

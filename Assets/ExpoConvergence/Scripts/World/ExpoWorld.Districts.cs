@@ -172,6 +172,9 @@ namespace ExpoConvergence
             }
             Kit.Block(g, "Lintel", new Vector3(0, 12.4f, -56.5f), new Vector3(17f, 1.2f, 2.2f), mWhite);
             Kit.Mesh(g, "LintelGlow", MeshGen.Box(new Vector3(15f, 0.08f, 2.22f)), portalMat, new Vector3(0, 11.75f, -56.5f), Vector3.one);
+            // Boards between the two faces' captions, so neither shows mirrored through the other.
+            Kit.Block(g, "SignBoard", new Vector3(0, 13.75f, -56.5f), new Vector3(13.6f, 1.5f, 2.2f), mDarkMetal);
+            Kit.Block(g, "BannerBoard", new Vector3(0, 10.7f, -56.5f), new Vector3(9.8f, 0.62f, 2.2f), mDarkMetal);
             // Text reads from its -Z side, so signs seen from the north are turned around.
             Kit.Text(g, "EXPO CITY DUBAI", new Vector3(0, 13.6f, -55.3f), 0.9f, Color.white).transform.localRotation = Quaternion.Euler(0, 180f, 0);
             Kit.Text(g, "OPENING NIGHT  ·  FESTIVAL OF PASSPORTS", new Vector3(0, 10.7f, -55.3f), 0.32f, ExpoPalette.Cyan).transform.localRotation = Quaternion.Euler(0, 180f, 0);
@@ -258,12 +261,12 @@ namespace ExpoConvergence
             doorUAE = Door(f, 0f, gold, "UAE PAVILION DISTRICT", mSand);
 
             // SW concourse: UAE consular gate terminal.
-            Terminal(new Vector3(-44.5f, 0f, -43.5f), new Vector3(-49f, 0f, -49f), PassportType.UAE, false, "UAE CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
+            RegisterObjective(0, Terminal(new Vector3(-44.5f, 0f, -43.5f), new Vector3(-49f, 0f, -49f), PassportType.UAE, false, "UAE CONSULAR GATE", "AUTHENTICATE", 1.1f, () =>
             {
                 doorUAE.Open();
                 GameEvents.RaiseToast("UAE DISTRICT OPEN  ·  THERMAL GRID ACTIVE", gold, 3f);
                 GameEvents.RaiseHint("Thermal sentries can't see you while MIRAGE CLOAK is active  ·  RIGHT-CLICK", 7f);
-            });
+            }));
             Planter(f.s, new Vector3(-6.5f, 0, -12f), new Vector3(2.4f, 1.2f, 2.4f), mSandDark, gold, true);
             Planter(f.s, new Vector3(6.2f, 0, -14f), new Vector3(2.4f, 1.2f, 2.4f), mSandDark, gold, true);
 
@@ -393,11 +396,11 @@ namespace ExpoConvergence
 
             // F2: consulate door, terminal guarded by a prism scanner.
             var innerDoor = Door(f, 40f, blue, "FRENCH CONSULATE", mLime);
-            Terminal(f.P(5.6f, 0, 35.5f), f.P(5.6f, 0, 32f), PassportType.France, false, "CONSULATE LOCK", "UNLOCK", 1.6f, () =>
+            RegisterObjective(3, Terminal(f.P(5.6f, 0, 35.5f), f.P(5.6f, 0, 32f), PassportType.France, false, "CONSULATE LOCK", "UNLOCK", 1.6f, () =>
             {
                 innerDoor.Open();
                 GameEvents.RaiseToast("CONSULATE DOOR UNLOCKED", blue, 2.5f);
-            });
+            }));
             Scanner(f, new Vector3(-1f, 0, 30.5f), opticalScanner, 50f, 90f);
             Kiosk(f.s, new Vector3(-6.4f, 0, 27f), 90f, blue, "CAFÉ LUMIÈRE");
             Topiary(f, new Vector3(2.5f, 0, 26f));
