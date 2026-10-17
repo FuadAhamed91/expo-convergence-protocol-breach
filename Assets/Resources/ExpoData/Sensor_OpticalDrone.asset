@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Sensor_OpticalDrone
   m_EditorClassIdentifier: Assembly-CSharp::ExpoConvergence.SensorProfile
   kind: 1
-  range: 11
-  fieldOfView: 52
-  detectionRate: 1.15
-  hearingRadius: 5.5
-  moveSpeed: 2.9
-  chaseSpeed: 6.2
+  range: 9.5
+  fieldOfView: 46
+  detectionRate: 0.8
+  hearingRadius: 4.5
+  moveSpeed: 2.6
+  chaseSpeed: 5.6

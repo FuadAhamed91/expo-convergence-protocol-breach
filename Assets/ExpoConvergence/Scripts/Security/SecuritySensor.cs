@@ -24,6 +24,11 @@ namespace ExpoConvergence
         Color currentColor;
         float coneAlpha = 0.2f;
 
+        // Ground vision fan: the floor footprint of the sensor's view, so threats read at a glance.
+        Transform groundFan;
+        Material fanMat;
+        const float FanAlpha = 0.42f;
+
         protected float disabledTimer;
         protected float chronoScale = 1f;
         float frozenFlash;
@@ -70,6 +75,35 @@ namespace ExpoConvergence
             }
             ApplyColor(IdleColor, 1f);
         }
+
+        /// <summary>Adds a floor sector (inner/outer radius, total angle) that follows the sensor's facing.</summary>
+        public void SetupGroundFan(float inner, float outer, float angleDeg)
+        {
+            var go = new GameObject("GroundFan");
+            go.transform.SetParent(transform, false);
+            go.AddComponent<MeshFilter>().sharedMesh = MeshGen.Annulus(inner, outer, 36, 90f - angleDeg * 0.5f, 90f + angleDeg * 0.5f);
+            var mr = go.AddComponent<MeshRenderer>();
+            fanMat = ExpoMaterials.Field(IdleColor, FanAlpha, true);
+            fanMat.SetFloat("_StripeDensity", 5f);
+            fanMat.SetFloat("_EdgeWidth", 0.035f);
+            mr.sharedMaterial = fanMat;
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            mr.receiveShadows = false;
+            groundFan = go.transform;
+            UpdateGroundFan();
+        }
+
+        void UpdateGroundFan()
+        {
+            if (groundFan == null || eye == null) return;
+            Vector3 f = eye.forward;
+            f.y = 0f;
+            if (f.sqrMagnitude < 0.0001f) f = transform.forward;
+            Vector3 p = transform.position;
+            groundFan.SetPositionAndRotation(new Vector3(p.x, 0.035f, p.z), Quaternion.LookRotation(f.normalized, Vector3.up));
+        }
+
+        protected virtual void LateUpdate() => UpdateGroundFan();
 
         protected virtual Color IdleColor => Kind == SensorKind.Thermal ? new Color(1f, 0.55f, 0.2f) : ExpoPalette.Cyan;
 
@@ -188,6 +222,11 @@ namespace ExpoConvergence
             {
                 statusLight.color = c;
                 statusLight.enabled = !IsDisabled;
+            }
+            if (fanMat != null)
+            {
+                fanMat.SetColor(ColorId, ExpoPalette.Hdr(c, 1.6f));
+                fanMat.SetFloat(AlphaId, IsDisabled ? FanAlpha * 0.12f : FanAlpha * (SeesPlayer ? 1.5f : 1f));
             }
         }
 

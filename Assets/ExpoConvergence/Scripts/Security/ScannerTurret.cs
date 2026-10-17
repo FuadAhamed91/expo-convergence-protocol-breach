@@ -63,6 +63,7 @@ namespace ExpoConvergence
             l.shadows = LightShadows.None;
 
             SetupVisuals(cone, new[] { gem }, l, 0.2f);
+            SetupGroundFan(0.8f, profile.range, 16f);
         }
 
         protected override void Tick(float scaledDt, float dt)

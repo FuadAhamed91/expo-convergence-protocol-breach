@@ -55,13 +55,13 @@ namespace ExpoConvergence
 
             alertVol = MakeVolume("PostFX_Alert", 1, out p);
             var aca = p.Add<ColorAdjustments>(true);
-            aca.colorFilter.Override(new Color(1f, 0.74f, 0.76f));
-            aca.saturation.Override(-5f);
+            aca.colorFilter.Override(new Color(1f, 0.88f, 0.89f));
+            aca.saturation.Override(-4f);
             var avig = p.Add<Vignette>(true);
-            avig.intensity.Override(0.44f);
-            avig.color.Override(new Color(0.45f, 0f, 0.02f));
-            avig.smoothness.Override(0.55f);
-            p.Add<ChromaticAberration>(true).intensity.Override(0.22f);
+            avig.intensity.Override(0.36f);
+            avig.color.Override(new Color(0.4f, 0f, 0.02f));
+            avig.smoothness.Override(0.5f);
+            p.Add<ChromaticAberration>(true).intensity.Override(0.14f);
 
             chronoVol = MakeVolume("PostFX_Chrono", 2, out p);
             var cca = p.Add<ColorAdjustments>(true);

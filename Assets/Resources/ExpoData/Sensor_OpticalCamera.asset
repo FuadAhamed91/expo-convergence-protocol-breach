@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Sensor_OpticalCamera
   m_EditorClassIdentifier: Assembly-CSharp::ExpoConvergence.SensorProfile
   kind: 1
-  range: 13
-  fieldOfView: 46
-  detectionRate: 1.25
+  range: 12
+  fieldOfView: 44
+  detectionRate: 0.95
   hearingRadius: 0
   moveSpeed: 3
   chaseSpeed: 6.2

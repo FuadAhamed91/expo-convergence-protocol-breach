@@ -10,11 +10,12 @@ namespace ExpoConvergence
 
         void LoadProfiles()
         {
-            thermalDrone = Load("Sensor_ThermalDrone") ?? SensorProfile.Create(SensorKind.Thermal, 11f, 52f, 1.15f, 5.5f, 2.8f, 6.0f);
-            opticalDrone = Load("Sensor_OpticalDrone") ?? SensorProfile.Create(SensorKind.Optical, 11f, 52f, 1.15f, 5.5f, 2.9f, 6.2f);
-            opticalCam = Load("Sensor_OpticalCamera") ?? SensorProfile.Create(SensorKind.Optical, 13f, 46f, 1.25f, 0f);
-            thermalScanner = Load("Sensor_ThermalScanner") ?? SensorProfile.Create(SensorKind.Thermal, 10.5f, 20f, 1.7f, 0f);
-            opticalScanner = Load("Sensor_OpticalScanner") ?? SensorProfile.Create(SensorKind.Optical, 10.5f, 20f, 1.7f, 0f);
+            // Tuned for a short judged demo: readable, fair, forgiving.
+            thermalDrone = Load("Sensor_ThermalDrone") ?? SensorProfile.Create(SensorKind.Thermal, 9.5f, 46f, 0.8f, 4.5f, 2.5f, 5.4f);
+            opticalDrone = Load("Sensor_OpticalDrone") ?? SensorProfile.Create(SensorKind.Optical, 9.5f, 46f, 0.8f, 4.5f, 2.6f, 5.6f);
+            opticalCam = Load("Sensor_OpticalCamera") ?? SensorProfile.Create(SensorKind.Optical, 12f, 44f, 0.95f, 0f);
+            thermalScanner = Load("Sensor_ThermalScanner") ?? SensorProfile.Create(SensorKind.Thermal, 10f, 20f, 1.3f, 0f);
+            opticalScanner = Load("Sensor_OpticalScanner") ?? SensorProfile.Create(SensorKind.Optical, 10f, 20f, 1.3f, 0f);
         }
 
         static SensorProfile Load(string name) => Resources.Load<SensorProfile>("ExpoData/" + name);
@@ -174,6 +175,9 @@ namespace ExpoConvergence
             // Text reads from its -Z side, so signs seen from the north are turned around.
             Kit.Text(g, "EXPO CITY DUBAI", new Vector3(0, 13.6f, -55.3f), 0.9f, Color.white).transform.localRotation = Quaternion.Euler(0, 180f, 0);
             Kit.Text(g, "OPENING NIGHT  ·  FESTIVAL OF PASSPORTS", new Vector3(0, 10.7f, -55.3f), 0.32f, ExpoPalette.Cyan).transform.localRotation = Quaternion.Euler(0, 180f, 0);
+            // Same sign on the outer face, seen during the intro flyover.
+            Kit.Text(g, "EXPO CITY DUBAI", new Vector3(0, 13.6f, -57.7f), 0.9f, Color.white);
+            Kit.Text(g, "OPENING NIGHT  ·  FESTIVAL OF PASSPORTS", new Vector3(0, 10.7f, -57.7f), 0.32f, ExpoPalette.Cyan);
 
             // Canopy over the arrival point.
             Kit.Mesh(g, "Canopy", MeshGen.Box(new Vector3(14f, 0.25f, 7f)), mWhite, new Vector3(0, 7.5f, -53f), Vector3.one);
@@ -188,7 +192,6 @@ namespace ExpoConvergence
             Bench(g, new Vector3(8f, 0, -45.5f), -90f, ExpoPalette.Cyan);
             Planter(g, new Vector3(-9.5f, 0, -50f), new Vector3(2f, 1.1f, 4f), mWhite, ExpoPalette.Cyan, true);
             Planter(g, new Vector3(9.5f, 0, -50f), new Vector3(2f, 1.1f, 4f), mWhite, ExpoPalette.Cyan, true);
-            HoloSign(dynamicRoot, new Vector3(0, 6.2f, -42.5f), "AL WASL DOME  ·  SEALED", "RESTORE THE THREE LANDMARK DISPLAYS", Color.white, 0.45f);
             LampPost(g, new Vector3(-11f, 0, -41.5f), ExpoPalette.Cyan, 0);
             LampPost(g, new Vector3(11f, 0, -41.5f), ExpoPalette.Cyan, 0);
             GuideStrip(g, new Vector3(-1.5f, 0, -49f), new Vector3(-12f, 0, -49f), ExpoPalette.Gold, 0.2f);
@@ -417,7 +420,7 @@ namespace ExpoConvergence
 
         void FranceArcade(Frame f, float z0, float z1)
         {
-            var blueGlow = ExpoMaterials.Emissive(ExpoPalette.Blue, 0.7f);
+            var blueGlow = ExpoMaterials.Emissive(new Color(0.18f, 0.36f, 0.85f), 0.38f);
             var blueNeon = ExpoMaterials.Emissive(ExpoPalette.Blue, 2.8f);
             var warmWindow = ExpoMaterials.Emissive(new Color(1f, 0.78f, 0.5f), 1.4f);
             float len = z1 - z0, mid = (z0 + z1) * 0.5f;
@@ -517,7 +520,7 @@ namespace ExpoConvergence
         void UKFacade(Frame f, float z0, float z1)
         {
             var emerald = ExpoMaterials.Emissive(ExpoPalette.Emerald, 2.6f);
-            var lancet = ExpoMaterials.Emissive(new Color(1f, 0.85f, 0.6f), 1.1f);
+            var lancet = ExpoMaterials.Emissive(new Color(1f, 0.72f, 0.42f), 0.5f);
             float len = z1 - z0, mid = (z0 + z1) * 0.5f;
             Kit.Block(f.s, "UKWall", new Vector3(-Half - 1.5f, 4.5f, mid), new Vector3(2f, 9f, len), mUkStone);
             Kit.Mesh(f.s, "UKBand", MeshGen.Box(new Vector3(0.06f, 0.08f, len)), emerald, new Vector3(-Half - 0.47f, 8.6f, mid), Vector3.one);

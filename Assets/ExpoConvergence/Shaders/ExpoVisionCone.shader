@@ -19,7 +19,8 @@ Shader "Expo/VisionCone"
             Tags { "LightMode" = "UniversalForward" }
             Blend SrcAlpha One
             ZWrite Off
-            Cull Off
+            // Outer faces only: a camera inside a cone must never get a full-screen wash of light.
+            Cull Back
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -77,7 +78,9 @@ Shader "Expo/VisionCone"
                 half facing = pow(saturate(abs(dot(n, v))), _EdgeSoftness);
                 half lengthFade = (1.0h - input.uv.y) * smoothstep(0.0h, 0.08h, input.uv.y);
                 half sweep = 0.5h + 0.5h * sin(input.uv.y * 18.0h - _Time.y * _ScanSpeed * 6.2831h);
-                half alpha = _Alpha * facing * lengthFade * (0.75h + 0.25h * sweep);
+                // Fade surfaces that are very close to the camera.
+                half nearFade = saturate((distance(input.positionWS, GetCameraPositionWS()) - 0.8h) / 2.5h);
+                half alpha = _Alpha * facing * lengthFade * nearFade * (0.75h + 0.25h * sweep);
                 half3 color = _Color.rgb * (1.0h + 0.4h * sweep);
                 color = MixFogColor(color, half3(0, 0, 0), input.fogFactor);
                 return half4(color, alpha);

@@ -14,7 +14,7 @@ Shader "Expo/NightSky"
         [HDR] _BandColor ("Band Color", Color) = (0.05, 0.12, 0.25, 1)
         _MoonDirection ("Moon Direction", Vector) = (-0.4, 0.45, 0.8, 0)
         [HDR] _MoonColor ("Moon Color", Color) = (1.6, 1.7, 2.0, 1)
-        _MoonSize ("Moon Size", Range(0.001, 0.05)) = 0.012
+        _MoonSize ("Moon Size", Range(0.00005, 0.01)) = 0.00028
     }
     SubShader
     {
@@ -88,8 +88,8 @@ Shader "Expo/NightSky"
                 // Moon disc with a soft halo.
                 float3 moonDir = normalize(_MoonDirection.xyz);
                 float m = dot(d, moonDir);
-                float disc = smoothstep(1.0 - _MoonSize, 1.0 - _MoonSize * 0.6, m);
-                float halo = pow(saturate(m), 220.0) * 0.35 + pow(saturate(m), 18.0) * 0.05;
+                float disc = smoothstep(1.0 - _MoonSize, 1.0 - _MoonSize * 0.7, m);
+                float halo = pow(saturate(m), 2400.0) * 0.4 + pow(saturate(m), 160.0) * 0.06;
                 sky += _MoonColor.rgb * (disc + halo);
 
                 return half4(sky, 1.0);

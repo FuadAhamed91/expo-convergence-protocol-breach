@@ -28,7 +28,7 @@ namespace ExpoConvergence
             switch (type)
             {
                 case PassportType.UAE:
-                    d.duration = 3f; d.cooldown = 6f; d.range = 0f;
+                    d.duration = 4f; d.cooldown = 5f; d.range = 0f;
                     d.abilityDescription = "Disrupts your thermal signature. Thermal drones, scanners and gold turnstiles cannot see you.";
                     break;
                 case PassportType.France:

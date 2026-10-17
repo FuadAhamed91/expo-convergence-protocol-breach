@@ -94,11 +94,12 @@ namespace ExpoConvergence
             searchlight.type = LightType.Spot;
             searchlight.spotAngle = profile.fieldOfView * 0.9f;
             searchlight.innerSpotAngle = profile.fieldOfView * 0.45f;
-            searchlight.range = profile.range * 1.15f;
-            searchlight.intensity = 9f;
+            searchlight.range = profile.range * 1.35f;
+            searchlight.intensity = 16f;
             searchlight.shadows = LightShadows.None;
 
-            SetupVisuals(coneGo, new[] { lens }, searchlight, 0.16f);
+            SetupVisuals(coneGo, new[] { lens }, searchlight, 0.2f);
+            SetupGroundFan(1.2f, profile.range * 0.95f, profile.fieldOfView);
             foreach (var r in visual.GetComponentsInChildren<Renderer>()) r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         }
 

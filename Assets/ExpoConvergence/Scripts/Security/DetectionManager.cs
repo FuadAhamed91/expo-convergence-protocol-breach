@@ -10,11 +10,11 @@ namespace ExpoConvergence
     /// </summary>
     public class DetectionManager : MonoBehaviour
     {
-        public float decayDelay = 1.1f;
-        public float decayRate = 0.32f;
-        public float alertCooldown = 4.5f;
-        public float lockdownTime = 2.6f;
-        public float captureRadius = 1.9f;
+        public float decayDelay = 0.9f;
+        public float decayRate = 0.42f;
+        public float alertCooldown = 4f;
+        public float lockdownTime = 3.6f;
+        public float captureRadius = 1.6f;
 
         public float Meter { get; private set; }
         public float Lockdown { get; private set; }

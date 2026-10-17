@@ -198,7 +198,7 @@ namespace ExpoConvergence
 
         IEnumerator FinaleRoutine()
         {
-            Color[] seq = { ExpoPalette.Gold, ExpoPalette.Blue, ExpoPalette.Emerald, Color.white };
+            Color[] seq = { ExpoPalette.Gold, ExpoPalette.Blue, ExpoPalette.Emerald, ExpoPalette.Cyan };
             float t = 0f;
             const float total = 14f;
             float nextFirework = 1.5f;
@@ -212,13 +212,13 @@ namespace ExpoConvergence
                 for (int i = 0; i < 3; i++)
                 {
                     if (sectorMats[i] == null) continue;
-                    sectorMats[i].SetColor(ColorId, ExpoPalette.Hdr(Color.Lerp(ExpoPalette.ForPassport((PassportType)i), c, 0.65f), 2.2f));
-                    sectorTarget[i] = 0.75f;
+                    sectorMats[i].SetColor(ColorId, ExpoPalette.Hdr(Color.Lerp(ExpoPalette.ForPassport((PassportType)i), c, 0.55f), 1.5f));
+                    sectorTarget[i] = 0.5f;
                 }
-                ExpoMaterials.SetEmission(latticeMat, c, 2.2f + Mathf.Sin(t * 3f) * 0.6f);
-                ExpoMaterials.SetEmission(oculusMat, c, 8f);
-                ExpoMaterials.SetEmission(crownMat, c, 5f);
-                if (domeLight != null) { domeLight.color = c; domeLight.intensity = 6f; }
+                ExpoMaterials.SetEmission(latticeMat, c, 1.2f + Mathf.Sin(t * 3f) * 0.4f);
+                ExpoMaterials.SetEmission(oculusMat, c, 5f);
+                ExpoMaterials.SetEmission(crownMat, c, 3.5f);
+                if (domeLight != null) { domeLight.color = c; domeLight.intensity = 4f; }
                 if (t >= nextFirework)
                 {
                     nextFirework = t + UnityEngine.Random.Range(0.18f, 0.45f);

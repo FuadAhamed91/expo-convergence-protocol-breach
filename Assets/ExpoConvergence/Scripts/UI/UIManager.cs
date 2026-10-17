@@ -174,7 +174,7 @@ namespace ExpoConvergence
             // Reticle and threat arrows.
             reticleDot = UIKit.Image(t, "Reticle", UISprites.Circle, new Color(1, 1, 1, 0.8f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(7, 7));
             reticleRing = UIKit.Image(t, "ReticleRing", UISprites.Ring, ExpoPalette.Blue.WithAlpha(0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(54, 54));
-            lockText = UIKit.Text(t, "LockText", "", 15f, ExpoPalette.Blue, new Vector2(0.5f, 0.5f), new Vector2(0, -48f), new Vector2(400, 22), TextAlignmentOptions.Center, true, 6f);
+            lockText = UIKit.Text(t, "LockText", "", 13f, ExpoPalette.Blue, new Vector2(0.5f, 0.5f), new Vector2(0, 46f), new Vector2(520, 22), TextAlignmentOptions.Center, true, 5f);
             for (int i = 0; i < arrows.Length; i++)
                 arrows[i] = UIKit.Image(t, "Threat" + i, UISprites.Arrow, ExpoPalette.Suspicious.WithAlpha(0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(34, 34));
 
@@ -192,7 +192,7 @@ namespace ExpoConvergence
             toastText = UIKit.Text(t, "Toast", "", 30f, Color.white, new Vector2(0.5f, 1f), new Vector2(0, -250f), new Vector2(1400, 44), TextAlignmentOptions.Center, true, 8f);
             toastGroup = toastText.gameObject.AddComponent<CanvasGroup>();
             toastGroup.alpha = 0f;
-            hintPanel = UIKit.Anchored(t, "Hint", new Vector2(0.5f, 0f), new Vector2(0, 200f), new Vector2(1100, 48));
+            hintPanel = UIKit.Anchored(t, "Hint", new Vector2(0.5f, 0f), new Vector2(0, 238f), new Vector2(1100, 48));
             hintGroup = hintPanel.gameObject.AddComponent<CanvasGroup>();
             UIKit.Image(hintPanel, "Back", UISprites.Rounded, new Color(0.02f, 0.035f, 0.07f, 0.72f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1100, 48), true);
             hintText = UIKit.Text(hintPanel, "Text", "", 20f, new Color(0.88f, 0.95f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1060, 40), TextAlignmentOptions.Center, false, 2f);
@@ -204,14 +204,22 @@ namespace ExpoConvergence
             var p = (PassportType)i;
             Color c = ExpoPalette.ForPassport(p);
             var card = new Card();
-            card.rt = UIKit.Anchored(parent, "Passport" + i, new Vector2(0.5f, 0f), new Vector2((i - 1) * 236f, 70f), new Vector2(220, 112));
+            card.rt = UIKit.Anchored(parent, "Passport" + i, new Vector2(0.5f, 0f), new Vector2((i - 1) * 256f, 70f), new Vector2(220, 112));
             card.glow = UIKit.Image(card.rt, "Glow", UISprites.Glow, c.WithAlpha(0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(300, 190));
             card.bg = UIKit.Image(card.rt, "Back", UISprites.Rounded, new Color(0.03f, 0.05f, 0.09f, 0.82f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(220, 112), true);
             card.bar = UIKit.Image(card.rt, "Bar", UISprites.White, c, new Vector2(0.5f, 1f), new Vector2(0, -3f), new Vector2(200, 4));
             card.key = UIKit.Text(card.rt, "Key", (i + 1).ToString(), 30f, c, new Vector2(0f, 1f), new Vector2(26f, -36f), new Vector2(40, 40), TextAlignmentOptions.Center, true, 0f);
             card.country = UIKit.Text(card.rt, "Country", ExpoPalette.CountryName(p), 15f, Color.white, new Vector2(0f, 1f), new Vector2(124f, -26f), new Vector2(160, 22), TextAlignmentOptions.Left, true, 5f);
-            card.ability = UIKit.Text(card.rt, "Ability", ExpoPalette.AbilityName(p), 19f, c, new Vector2(0f, 1f), new Vector2(124f, -50f), new Vector2(160, 26), TextAlignmentOptions.Left, true, 3f);
+            card.ability = UIKit.Text(card.rt, "Ability", ExpoPalette.AbilityName(p), 17f, c, new Vector2(0f, 1f), new Vector2(122f, -50f), new Vector2(150, 26), TextAlignmentOptions.Left, true, 2f);
             card.status = UIKit.Text(card.rt, "Status", "READY", 13f, ExpoPalette.TextDim, new Vector2(0.5f, 0f), new Vector2(0, 18f), new Vector2(200, 20), TextAlignmentOptions.Center, true, 8f);
+            foreach (var label in new[] { card.country, card.ability, card.status })
+            {
+                // Shrink long names (e.g. MIRAGE CLOAK, UNITED KINGDOM) to fit the card instead of spilling over.
+                label.textWrappingMode = TextWrappingModes.NoWrap;
+                label.enableAutoSizing = true;
+                label.fontSizeMax = label.fontSize;
+                label.fontSizeMin = 10f;
+            }
             card.cooldown = UIKit.Image(card.rt, "Cooldown", UISprites.Rounded, new Color(0f, 0f, 0f, 0.55f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(220, 112), false);
             card.cooldown.type = Image.Type.Filled;
             card.cooldown.fillMethod = Image.FillMethod.Horizontal;
@@ -332,6 +340,7 @@ namespace ExpoConvergence
                 new Vector2(0.5f, 0.5f), new Vector2(0, 250f), new Vector2(1800, 120), TextAlignmentOptions.Center, true, 14f);
             head.richText = true;
             UIKit.Text(t, "Sub", "THE OPENING CEREMONY IS LIVE  ·  THE FESTIVAL OF PASSPORTS BEGINS", 22f, new Color(0.85f, 0.94f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0, 175f), new Vector2(1600, 34), TextAlignmentOptions.Center, false, 8f);
+            UIKit.Image(t, "StatsPanel", UISprites.Rounded, new Color(0.02f, 0.035f, 0.07f, 0.86f), new Vector2(0.5f, 0.5f), new Vector2(0, 0f), new Vector2(1060, 330), true);
             victoryRank = UIKit.Text(t, "Rank", "S", 140f, ExpoPalette.Gold, new Vector2(0.5f, 0.5f), new Vector2(-300f, 20f), new Vector2(300, 170), TextAlignmentOptions.Center, true, 0f);
             victoryRankTitle = UIKit.Text(t, "RankTitle", "GHOST DIPLOMAT", 22f, Color.white, new Vector2(0.5f, 0.5f), new Vector2(-300f, -78f), new Vector2(420, 30), TextAlignmentOptions.Center, true, 8f);
             victoryStats = UIKit.Text(t, "Stats", "", 26f, Color.white, new Vector2(0.5f, 0.5f), new Vector2(160f, 10f), new Vector2(620, 240), TextAlignmentOptions.Left, false, 2f);
@@ -573,7 +582,7 @@ namespace ExpoConvergence
             bool alert = d.Level == AlertLevel.Alert;
             lockdownGroup.gameObject.SetActive(alert);
             lockdownFill.fillAmount = d.Lockdown;
-            float vig = alert ? 0.55f + 0.2f * Mathf.Sin(Time.time * 6f) : d.Meter * 0.35f;
+            float vig = alert ? 0.32f + 0.12f * Mathf.Sin(Time.time * 6f) : d.Meter * 0.18f;
             alertVignette.color = new Color(1f, 0.08f, 0.12f, Mathf.Lerp(alertVignette.color.a, vig, 1f - Mathf.Exp(-6f * dt)));
         }
 
@@ -588,6 +597,10 @@ namespace ExpoConvergence
                 bool unlocked = pm.IsUnlocked(p);
                 bool active = pm.Active == p;
                 card.locked.gameObject.SetActive(!unlocked);
+                card.key.enabled = unlocked;
+                card.country.enabled = unlocked;
+                card.ability.enabled = unlocked;
+                card.status.enabled = unlocked;
                 float targetScale = active ? 1.08f : 0.94f;
                 card.rt.localScale = Vector3.Lerp(card.rt.localScale, Vector3.one * targetScale, 0.2f);
                 Color c = ExpoPalette.ForPassport(p);
@@ -638,7 +651,7 @@ namespace ExpoConvergence
             else
             {
                 ((RectTransform)reticleRing.transform).anchoredPosition = Vector2.Lerp(((RectTransform)reticleRing.transform).anchoredPosition, Vector2.zero, 0.35f);
-                lockText.text = france ? "PRISM PULSE  ·  AIM AT A CAMERA OR SCANNER" : "";
+                lockText.text = france ? "AIM AT A CAMERA OR SCANNER" : "";
             }
             lockText.color = target != null ? ExpoPalette.Blue : ExpoPalette.TextDim;
         }

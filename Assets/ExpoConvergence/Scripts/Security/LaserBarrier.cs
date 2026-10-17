@@ -97,7 +97,7 @@ namespace ExpoConvergence
             lr.positionCount = 2;
             lr.SetPosition(0, a);
             lr.SetPosition(1, b);
-            lr.widthMultiplier = 0.075f;
+            lr.widthMultiplier = 0.12f;
             lr.textureMode = LineTextureMode.Stretch;
             lr.sharedMaterial = beamMat;
             lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;

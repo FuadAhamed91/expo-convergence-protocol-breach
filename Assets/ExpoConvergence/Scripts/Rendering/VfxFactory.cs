@@ -80,15 +80,7 @@ namespace ExpoConvergence
             var r = ps.GetComponent<ParticleSystemRenderer>();
             r.trailMaterial = ExpoMaterials.ParticleAdditive;
             ps.Play();
-            var flash = new GameObject("FireworkFlash");
-            flash.transform.position = pos;
-            var l = flash.AddComponent<Light>();
-            l.type = LightType.Point;
-            l.color = color;
-            l.range = 30f;
-            l.intensity = 6f;
-            l.shadows = LightShadows.None;
-            flash.AddComponent<LightFade>().Init(0.9f);
+            // No per-shell light: bloom carries the glow, and many large lights stall integrated GPUs.
         }
 
         /// <summary>Gold sand sparkles orbiting the courier while the Mirage Cloak is active.</summary>

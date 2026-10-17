@@ -44,6 +44,14 @@ namespace ExpoConvergence.EditorTools
             Debug.Log("[ExpoSetup] Textures and materials regenerated.");
         }
 
+        [MenuItem("Expo/Sync Gameplay Data", priority = 21)]
+        public static void SyncData()
+        {
+            CreateData();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[ExpoSetup] Passport and sensor data synced.");
+        }
+
         // ------------------------------------------------------------------ layers
 
         static void EnsureLayers()
@@ -327,7 +335,7 @@ namespace ExpoConvergence.EditorTools
             SaveMat("M_FieldBase", field, m => { });
             SaveMat("M_ConeBase", cone, m => { });
             SaveMat("M_BeamBase", beam, m => { });
-            SaveMat("M_Sky", sky, m => { });
+            SaveMat("M_Sky", sky, m => { m.SetFloat("_MoonSize", 0.00028f); });
             SaveMat("M_ParticleAdd", particle, m => { m.SetTexture("_MainTex", Tex("T_SoftDot")); m.SetColor("_Color", new Color(3f, 3f, 3f, 1f)); });
             SaveMat("M_Glass", holo, m =>
             {
@@ -341,8 +349,8 @@ namespace ExpoConvergence.EditorTools
 
             var tiles = Tex("T_FloorTiles");
             var blocks = Tex("T_Blocks");
-            SaveMat("M_Floor", lit, m => Lit(m, new Color(0.12f, 0.14f, 0.19f), 0.82f, 0.15f, tiles, new Vector2(0.5f, 0.5f)));
-            SaveMat("M_FloorDark", lit, m => Lit(m, new Color(0.055f, 0.065f, 0.09f), 0.86f, 0.2f, tiles, new Vector2(0.25f, 0.25f)));
+            SaveMat("M_Floor", lit, m => Lit(m, new Color(0.085f, 0.1f, 0.14f), 0.66f, 0.12f, tiles, new Vector2(0.5f, 0.5f)));
+            SaveMat("M_FloorDark", lit, m => Lit(m, new Color(0.045f, 0.055f, 0.075f), 0.72f, 0.2f, tiles, new Vector2(0.25f, 0.25f)));
             SaveMat("M_Path", lit, m => Lit(m, new Color(0.14f, 0.16f, 0.21f), 0.7f, 0.1f, tiles, new Vector2(0.5f, 0.5f)));
             SaveMat("M_Wall", lit, m => Lit(m, new Color(0.1f, 0.12f, 0.17f), 0.38f, 0.25f, blocks, new Vector2(0.25f, 0.25f)));
             SaveMat("M_Metal", lit, m => Lit(m, new Color(0.24f, 0.27f, 0.33f), 0.78f, 0.85f));
@@ -387,22 +395,37 @@ namespace ExpoConvergence.EditorTools
         static void CreateData()
         {
             Directory.CreateDirectory(DataDir);
+            // Create missing assets and sync tuning into existing ones (code defaults are the source of truth).
             foreach (PassportType t in System.Enum.GetValues(typeof(PassportType)))
             {
                 string path = $"{DataDir}/Passport_{t}.asset";
-                if (AssetDatabase.LoadAssetAtPath<PassportDefinition>(path) == null)
-                    AssetDatabase.CreateAsset(PassportDefinition.CreateDefault(t), path);
+                var fresh = PassportDefinition.CreateDefault(t);
+                var existing = AssetDatabase.LoadAssetAtPath<PassportDefinition>(path);
+                if (existing == null) AssetDatabase.CreateAsset(fresh, path);
+                else
+                {
+                    EditorUtility.CopySerialized(fresh, existing);
+                    existing.name = "Passport_" + t;
+                    EditorUtility.SetDirty(existing);
+                }
             }
             void Profile(string name, SensorProfile p)
             {
                 string path = $"{DataDir}/{name}.asset";
-                if (AssetDatabase.LoadAssetAtPath<SensorProfile>(path) == null) AssetDatabase.CreateAsset(p, path);
+                var existing = AssetDatabase.LoadAssetAtPath<SensorProfile>(path);
+                if (existing == null) AssetDatabase.CreateAsset(p, path);
+                else
+                {
+                    EditorUtility.CopySerialized(p, existing);
+                    existing.name = name;
+                    EditorUtility.SetDirty(existing);
+                }
             }
-            Profile("Sensor_ThermalDrone", SensorProfile.Create(SensorKind.Thermal, 11f, 52f, 1.15f, 5.5f, 2.8f, 6.0f));
-            Profile("Sensor_OpticalDrone", SensorProfile.Create(SensorKind.Optical, 11f, 52f, 1.15f, 5.5f, 2.9f, 6.2f));
-            Profile("Sensor_OpticalCamera", SensorProfile.Create(SensorKind.Optical, 13f, 46f, 1.25f, 0f));
-            Profile("Sensor_ThermalScanner", SensorProfile.Create(SensorKind.Thermal, 10.5f, 20f, 1.7f, 0f));
-            Profile("Sensor_OpticalScanner", SensorProfile.Create(SensorKind.Optical, 10.5f, 20f, 1.7f, 0f));
+            Profile("Sensor_ThermalDrone", SensorProfile.Create(SensorKind.Thermal, 9.5f, 46f, 0.8f, 4.5f, 2.5f, 5.4f));
+            Profile("Sensor_OpticalDrone", SensorProfile.Create(SensorKind.Optical, 9.5f, 46f, 0.8f, 4.5f, 2.6f, 5.6f));
+            Profile("Sensor_OpticalCamera", SensorProfile.Create(SensorKind.Optical, 12f, 44f, 0.95f, 0f));
+            Profile("Sensor_ThermalScanner", SensorProfile.Create(SensorKind.Thermal, 10f, 20f, 1.3f, 0f));
+            Profile("Sensor_OpticalScanner", SensorProfile.Create(SensorKind.Optical, 10f, 20f, 1.3f, 0f));
         }
 
         // ------------------------------------------------------------------ scene

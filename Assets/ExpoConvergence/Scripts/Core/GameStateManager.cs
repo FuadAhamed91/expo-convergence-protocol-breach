@@ -198,6 +198,8 @@ namespace ExpoConvergence
             finishTime = Time.time;
             Game.Countdown?.Stop();
             SetState(GameState.Victory);
+            // Slow exterior orbit of the illuminated dome behind the results.
+            Game.Cinematics?.StartTitleOrbit();
             Game.UI?.ShowVictory();
         }
 

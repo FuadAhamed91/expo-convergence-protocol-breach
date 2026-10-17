@@ -165,7 +165,7 @@ namespace ExpoConvergence
             for (int s = -1; s <= 1; s += 2)
                 Kit.Block(g, "SealPylon", new Vector3(3.6f * s, 3f, 0), new Vector3(1.1f, 6f, 1.2f), frame);
             Kit.Block(g, "SealLintel", new Vector3(0, 6.3f, 0), new Vector3(8.4f, 0.8f, 1.2f), frame);
-            var fieldMat = ExpoMaterials.Field(Color.Lerp(ExpoPalette.Cyan, Color.white, 0.3f), 0.55f, true);
+            var fieldMat = ExpoMaterials.Field(ExpoPalette.Cyan, 0.3f, true);
             var field = Kit.Mesh(g, "SealField", MeshGen.Quad(6.1f, 5.9f), fieldMat, Vector3.zero, Vector3.one);
             field.shadowCastingMode = ShadowCastingMode.Off;
             var locks = new Renderer[3];
@@ -208,7 +208,8 @@ namespace ExpoConvergence
             // Base lighting that switches on when restored.
             for (int k = 0; k < 2; k++)
             {
-                var l = Kit.PointLight(go.transform, new Vector3(0, height * (0.15f + k * 0.4f), 0), ExpoPalette.ForPassport(nation), height * 0.55f, 3f);
+                // Range is capped: huge light volumes are costly on integrated GPUs.
+                var l = Kit.PointLight(go.transform, new Vector3(0, height * (0.12f + k * 0.35f), 0), ExpoPalette.ForPassport(nation), Mathf.Min(height * 0.5f, 34f), 2.4f);
                 lc.AddLight(l);
             }
             // Sky beam.
@@ -499,7 +500,7 @@ namespace ExpoConvergence
                 waterOrbs.Add(orb);
             }
             // Security searchlights sweeping the sky from behind the facades.
-            var beam = ExpoMaterials.Beam(new Color(0.55f, 0.85f, 1f), 1.6f);
+            var beam = ExpoMaterials.Beam(new Color(0.55f, 0.85f, 1f), 0.7f);
             Vector3[] corners = { new Vector3(-66, 0, -66), new Vector3(66, 0, 66), new Vector3(-66, 0, 66), new Vector3(66, 0, -66) };
             for (int i = 0; i < corners.Length; i++)
             {

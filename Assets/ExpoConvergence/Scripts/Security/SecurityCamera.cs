@@ -60,7 +60,8 @@ namespace ExpoConvergence
             l.shadows = LightShadows.None;
 
             fovOverride = new Vector2(profile.fieldOfView * 1.35f, profile.fieldOfView);
-            SetupVisuals(cone, new[] { lens, led }, l, 0.14f);
+            SetupVisuals(cone, new[] { lens, led }, l, 0.18f);
+            SetupGroundFan(2.2f, profile.range * 0.92f, profile.fieldOfView * 1.35f);
             baseYaw = 0f;
         }
 
